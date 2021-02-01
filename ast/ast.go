@@ -16,6 +16,7 @@ type Expression interface {
 	ExpressionNode()
 }
 
+//ASTのルートノード
 type Program struct {
 	Statements []Statement
 }

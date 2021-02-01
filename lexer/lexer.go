@@ -2,20 +2,22 @@ package lexer
 
 import "github.com/yuta4j1/monkey-interpreter/token"
 
+// 字句解析器
 type Lexer struct {
-	input        string
-	position     int
-	readPosition int
-	ch           byte
+	input        string // 対象となる文字列
+	position     int    // 現在の文字へのカーソル位置
+	readPosition int    // 次の文字へのカーソル位置
+	ch           byte   // 読み取った文字
 }
 
 func New(input string) *Lexer {
 	l := &Lexer{input: input}
+	// カーソルを最初の文字に設定
 	l.readChar()
 	return l
 }
 
-// 一文字ずつ読む
+// 一文字読む。readPositionは次の文字に設定する
 func (l *Lexer) readChar() {
 	if l.readPosition >= len(l.input) {
 		l.ch = 0
@@ -27,6 +29,7 @@ func (l *Lexer) readChar() {
 }
 
 // 空白をスキップする
+// 現在カーソルの文字が空白文字でなくなるまで、読み取りを進める
 func (l *Lexer) skipWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
 		l.readChar()
@@ -106,8 +109,10 @@ func (l *Lexer) NextToken() token.Token {
 
 // 識別子を読み、非英字に到達するまで字句解析の位置を進める
 func (l *Lexer) readIdentifier() string {
+	// 現在のカーソル位置
 	position := l.position
 	for isLetter(l.ch) {
+		// 英字でなくなるまで、文字を読み続ける
 		l.readChar()
 	}
 	return l.input[position:l.position]
@@ -117,6 +122,7 @@ func (l *Lexer) readIdentifier() string {
 func (l *Lexer) readNumber() string {
 	position := l.position
 	for isDigit(l.ch) {
+		// 数値でなくなるまで、文字を読み続ける
 		l.readChar()
 	}
 	return l.input[position:l.position]
@@ -133,14 +139,17 @@ func (l *Lexer) peekChar() byte {
 	}
 }
 
+// トークンを作成する
 func newToken(tokenType token.TokenType, ch byte) token.Token {
 	return token.Token{Type: tokenType, Literal: string(ch)}
 }
 
+// 文字判定
 func isLetter(ch byte) bool {
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
 }
 
+// 数値判定
 func isDigit(ch byte) bool {
 	return '0' <= ch && ch <= '9'
 }
